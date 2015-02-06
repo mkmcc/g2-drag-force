@@ -1,0 +1,10 @@
+this directory contains kepler-fit-g2.py and kepler-fit-g1.py, which
+fit G1 and G2 to keplerian orbits.  the resulting markov chains
+contain the correlated uncertainties in all the fit parameters, so can
+be used to derive the difference in angular momentum between the two
+orbits, along with the error bar on the difference.
+
+# Local Variables:
+# mode: org
+# coding: utf-8-unix
+# End:

@@ -1,0 +1,25 @@
+* g2-drag-force
+  This repository contains the code used in McCourt & Madigan (2015)
+  to model the orbit of the G2 gas cloud in the galactic center.  We
+  assume the cloud is elongated in its direction of motion, and we
+  integrate its trajectory assuming it feels a drag force as it passes
+  through rotating accretion flow.  By comparing the resulting
+  trajectory against the observed positions and velocities for G2 and
+  G1, we attempt to constrain the properties of the accretion flow in
+  the galactic center.  See McCourt & Madigan (2015) for details.
+
+* organization
+  We provide two versions of the code: a mathematica implementation
+  which is designed to be easy to edit and experiment with, and a
+  python implementation intended to be run on a supercomputer for
+  exploring the parameter space.  We also include code to fit G1 and
+  G2 to Keplerian orbits.
+
+* license
+  All code is released under the GPL license -- feel free to use and
+  modify it as you see fit.
+
+# Local Variables:
+# mode: org
+# coding: utf-8-unix
+# End:

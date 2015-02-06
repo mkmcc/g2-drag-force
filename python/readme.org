@@ -1,0 +1,31 @@
+This directory contains a program to fit the observational data and
+determine the uncertainty in our model parameters.  Since we wanted to
+be able to run this on the stampede supercomputer, we chose to
+implement it in python.
+
+The program lives in =drag-force-mla.py=, and its primary function is
+=integrate_model()=, which integrates the equation of motion for the
+cloud and returns vectors with its position and velocity as functions
+of time.  We then use the function =chi_sq()= to compare the resulting
+solution against the data published in [[http://adsabs.harvard.edu/abs/2013ApJ...774...44G][Gillessen et al. (2013b)]] and in
+[[http://adsabs.harvard.edu/abs/2015ApJ...798..111P][Pfuhl et al. (2015)]].  We thus estimate the likelihood of the model and
+use the [[http://dan.iel.fm/emcee/current/][emcee]] MCMC implementation to explore the parameter space.  See
+McCourt & Madigan (2015) for more details.
+
+The result is a list of models, which should approximate a sample
+drawn from the true probability distribution.  We include a plotting
+script in =parameter-space.rb= which bins the models and plots
+projections of the resulting probability distribution -- this makes
+figure 6 in our paper.  This uses [[http://tioga.sourceforge.net/][tioga]], a wonderful plotting library
+for ruby.
+
+Since this MCMC exploration is fairly expensive, we wrote this code
+with the assumption that it will run over MPI on a computer cluster.
+We included a sample job script for the stampede supercomputer in
+=stampede.pbs=.  The comments in =drag-force-mla.py= describe how to
+modify the code to run on a single processor.
+
+# Local Variables:
+# mode: org
+# coding: utf-8-unix
+# End:

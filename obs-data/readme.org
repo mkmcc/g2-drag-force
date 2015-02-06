@@ -1,0 +1,6 @@
+astrometry and velocity data for G1 and G2
+
+The data for G2 comes from the [[https://wiki.mpe.mpg.de/gascloud/PlotsNData][wiki page]]; this was published in
+[[http://adsabs.harvard.edu/abs/2013ApJ...774...44G][Gillessen et al. (2013b)]].
+
+The data for G1 comes from figure 8 of [[http://adsabs.harvard.edu/abs/2015ApJ...798..111P][Pfuhl et al. (2015)]].

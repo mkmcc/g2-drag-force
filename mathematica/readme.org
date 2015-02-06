@@ -1,0 +1,28 @@
+This directory contains mathematica code to integrate trajectories and
+find the best-fitting model.  This is easier to modify and experiment
+with than the python code, but it's hard to find a supercomputer with
+mathematica installed.  So this is useful for testing, for plotting,
+and for finding the best-fit solution.  But I'd recommend the python
+implementation for doing the full MCMC sampling of the parameter
+space.
+    
+In order to make the code more re-usable, I split this up into
+several files:
+
+- *preliminaries.m* contains some useful definitions
+    
+- *initial-cond.m* determines an initial position and velocity for G2
+  consistent with the observations
+    
+- *mk-orbit.m* contains the main modeling function
+  
+- *chi-sq.m* and *run.m* contain code to find the best-fitting parameters
+    
+To use this, I'd recommend first getting the awesome [[http://ai.eecs.umich.edu/people/dreeves/mash/][mash]] script to
+run mathematica from the command line.  Then, just type "mash ./run.m"
+and wait
+
+# Local Variables:
+# mode: org
+# coding: utf-8-unix
+# End:
