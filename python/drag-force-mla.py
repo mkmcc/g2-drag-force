@@ -203,7 +203,7 @@ def rotation_matrix(vector_orig, vector_fin):
 #
 # helper function to compute the drag force
 #
-def drag_force(r,v,  alpha, logbeta, fkep, theta, phi, loggf):
+def drag_force(r,v,  alpha, logbeta, fkep, theta, phi, loggf, frad):
     gf = exp(loggf)             # gf is L/R (= "geometric factor")
     Sigma = 1015691.12          # 3 earth masses / (100 AU)^2
 
@@ -214,7 +214,7 @@ def drag_force(r,v,  alpha, logbeta, fkep, theta, phi, loggf):
                cos(theta)])
 
     vbg  = (cross(J,r)/norm(J)/norm(r)) * fkep * sqrt(gm/norm(r))
-    vbg  = vbg + r/norm(r) * sqrt(gm/norm(r))
+    vbg  = vbg + r/norm(r) * frad * sqrt(gm/norm(r))
     vrel = v - vbg
 
     # get the prefactor for the drag force
@@ -241,13 +241,13 @@ def drag_force(r,v,  alpha, logbeta, fkep, theta, phi, loggf):
 # - Y is the state vector [r, v]
 # - return the derivative vector [v, a]
 #
-def f(Y,t,  alpha, logbeta, fkep, theta, phi, loggf):
+def f(Y,t,  alpha, logbeta, fkep, theta, phi, loggf, frad):
     x, y, z, vx, vy, vz = Y
     d3 = (x**2 + y**2 + z**2)**1.5
 
     fx, fy, fz = drag_force(array([ x,  y,  z]),
                             array([vx, vy, vz]),
-                            alpha, logbeta, fkep, theta, phi, loggf)
+                            alpha, logbeta, fkep, theta, phi, loggf, frad)
 
     return np.array([ vx, vy, vz,
                       -gm*x/d3 - fx,
@@ -256,7 +256,7 @@ def f(Y,t,  alpha, logbeta, fkep, theta, phi, loggf):
 
 # integrate the trajectory
 #
-def integrate_model(alpha, logbeta, fkep, theta, phi, loggf,
+def integrate_model(alpha, logbeta, fkep, theta, phi, loggf, frad,
                     raShift, decShift, vraShift, vdecShift):
     # initial condition
     #
@@ -282,8 +282,8 @@ def integrate_model(alpha, logbeta, fkep, theta, phi, loggf,
 
     # integrate forwards and backwards
     #
-    ofwd = odeint(f, y0, tfwd, args=(alpha, logbeta, fkep, theta, phi, loggf))
-    obak = odeint(f, y0, tbak, args=(alpha, logbeta, fkep, theta, phi, loggf))
+    ofwd = odeint(f, y0, tfwd, args=(alpha, logbeta, fkep, theta, phi, loggf, frad))
+    obak = odeint(f, y0, tbak, args=(alpha, logbeta, fkep, theta, phi, loggf, frad))
 
 
     # join the solutions
@@ -356,10 +356,10 @@ def chi_sq_g1(t, sol, lnfp, lnfv):
 
 # total chi^2 for the model
 #
-def chi_sq(alpha, logbeta, fkep, theta, phi, loggf,
+def chi_sq(alpha, logbeta, fkep, theta, phi, loggf, frad,
            raShift, decShift, vraShift, vdecShift, lnfp, lnfv):
 
-    t, sol = integrate_model(alpha, logbeta, fkep, theta, phi, loggf,
+    t, sol = integrate_model(alpha, logbeta, fkep, theta, phi, loggf, frad,
                              raShift, decShift, vraShift, vdecShift)
 
     dtg1, chisqg1 = chi_sq_g1(t, sol, lnfp, lnfv)
@@ -392,6 +392,7 @@ def random_ic():
     alpha     =  8.598847643691621689e-01
     logbeta   =  3.199742509393102008e-01
     fkep      =  6.851834170728353657e-01
+    frad      =  0.0
     theta     =  1.754460524831643609e+00
     phi       = -6.648098517051298506e-01
     loggf     =  2.695946924174811077e+00
@@ -406,6 +407,7 @@ def random_ic():
     alpha     = np.random.normal(alpha,     np.abs(0.01 * alpha))
     logbeta   = np.random.normal(logbeta,   np.abs(0.01 * logbeta))
     fkep      = np.random.normal(fkep,      np.abs(0.01 * fkep))
+    frad      = np.random.normal(frad,      np.abs(0.1))
     theta     = np.random.normal(theta,     np.abs(0.01 * theta))
     phi       = np.random.normal(phi,       np.abs(0.01 * phi))
     loggf     = np.random.normal(loggf,     np.abs(0.01 * loggf))
@@ -416,7 +418,7 @@ def random_ic():
     lnfp      = np.random.normal(lnfp,      np.abs(0.01 * lnfp))
     lnfv      = np.random.normal(lnfv,      np.abs(0.01 * lnfv))
 
-    return [alpha, logbeta, fkep, theta, phi, loggf,
+    return [alpha, logbeta, fkep, theta, phi, loggf, frad,
             raShift, decShift, vraShift, vdecShift, lnfp, lnfv]
 
 
@@ -429,12 +431,13 @@ def lnprob(p):
     theta     = p[3]
     phi       = p[4]
     loggf     = p[5]
-    raShift   = p[6]
-    decShift  = p[7]
-    vraShift  = p[8]
-    vdecShift = p[9]
-    lnfp      = p[10]
-    lnfv      = p[11]
+    frad      = p[6]
+    raShift   = p[7]
+    decShift  = p[8]
+    vraShift  = p[9]
+    vdecShift = p[10]
+    lnfp      = p[11]
+    lnfv      = p[12]
 
     # apply parameter constraints here.  priors should go here, as well.
     #
@@ -445,6 +448,9 @@ def lnprob(p):
         return -np.inf
 
     if fkep<=0.0 or fkep>1.0:
+        return -np.inf
+
+    if frad<=-1.0 or frad>1.0:
         return -np.inf
 
     if theta<0.0 or theta>pi:
@@ -469,7 +475,7 @@ def lnprob(p):
     # we have to let it fail and return a large chi^2 when it does.
 
     try:
-        ret = chi_sq(alpha, logbeta, fkep, theta, phi, loggf,
+        ret = chi_sq(alpha, logbeta, fkep, theta, phi, loggf, frad,
                      raShift, decShift, vraShift, vdecShift, lnfp, lnfv)
     except:
         ret = np.inf
@@ -483,7 +489,7 @@ def lnprob(p):
 #
 # use 4096 walkers to explore the 12-dimensional parameter space
 #
-ndim     = 12
+ndim     = 13
 nwalkers = 4096
 
 
