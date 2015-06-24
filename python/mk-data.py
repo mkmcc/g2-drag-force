@@ -208,13 +208,13 @@ def integrate_model(alpha, logbeta, fkep, theta, phi, loggf,
 alpha     =  0.6
 logbeta   =  0.3
 fkep      =  0.5
-theta     =  1.754460524831643609e+00
-phi       = -6.648098517051298506e-01
+theta     =  pi / 4.0
+phi       =  pi / 3.0
 loggf     =  log(14.0)
-raShift   =  1.114870617771124360e-04
-decShift  =  1.661446928084823094e-05
-vraShift  =  9.256909974821245766e-05
-vdecShift =  3.162990726641473789e-05
+raShift   =  0.0
+decShift  =  0.0
+vraShift  =  0.0
+vdecShift =  0.0
 
 t, sol = integrate_model(alpha, logbeta, fkep, theta, phi, loggf,
                          raShift, decShift, vraShift, vdecShift)
