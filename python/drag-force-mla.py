@@ -213,7 +213,7 @@ def drag_force(r,v,  alpha, logbeta, fkep, theta, phi, loggf):
                sin(theta) * sin(phi),
                cos(theta)])
 
-    vbg  = (cross(J,r)/norm(J)/norm(r)) * fkep * sqrt(gm/norm(r))
+    vbg  = (cross(J,r)/norm(cross(J,r))) * fkep * sqrt(gm/norm(r))
     vrel = v - vbg
 
     # get the prefactor for the drag force
